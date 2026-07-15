@@ -45,4 +45,4 @@ reference/         Product brief, source spreadsheet, and MHC shapefile (not dep
 
 ## License
 
-TBD.
+[MIT](LICENSE).
