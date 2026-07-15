@@ -63,12 +63,17 @@ export default function Toolbar({
         }
 
         if (merged) {
+          // Round coords to ~1m precision so near-coincident vertices from
+          // adjacent parcels collapse to a single point.
+          merged = roundCoords(merged, 5)
+          // Drop exact duplicates and collinear points.
+          try { merged = turf.cleanCoords(merged) } catch { /* keep merged */ }
           // Light simplify: ~2m tolerance drops near-duplicate vertices without
           // flattening real parcel edges.
           const simplified = turf.simplify(merged, { tolerance: 0.00002, highQuality: true })
           setBoundaryLayer(simplified || merged)
           setEditingBoundary(true)
-          setStatusMessage(`Boundary created from ${selectedFeatures.length} parcels — drag vertices to edit, then export`)
+          setStatusMessage(`Boundary created from ${selectedFeatures.length} parcels — drag vertices to edit, right-click to remove, click midpoints to add`)
         }
       } catch (err) {
         setStatusMessage('Error creating boundary: ' + err.message)
@@ -157,6 +162,25 @@ export default function Toolbar({
       )}
     </div>
   )
+}
+
+// Round every coordinate to `decimals` places, in place-safe fashion (returns a new feature).
+// At MA latitude, 5 decimal places ≈ 1m — enough to collapse sub-meter parcel-boundary noise.
+function roundCoords(feature, decimals) {
+  const factor = 10 ** decimals
+  const round = (c) => [Math.round(c[0] * factor) / factor, Math.round(c[1] * factor) / factor]
+  const roundRing = (ring) => ring.map(round)
+  const roundPoly = (poly) => poly.map(roundRing)
+  const g = feature.geometry
+  let next
+  if (g.type === 'Polygon') {
+    next = { ...g, coordinates: roundPoly(g.coordinates) }
+  } else if (g.type === 'MultiPolygon') {
+    next = { ...g, coordinates: g.coordinates.map(roundPoly) }
+  } else {
+    return feature
+  }
+  return { ...feature, geometry: next }
 }
 
 function geojsonToKml(geojson) {
