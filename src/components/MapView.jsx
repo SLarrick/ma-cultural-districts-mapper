@@ -715,14 +715,14 @@ export default function MapView({
       />
 
       {/* Cultural asset dots — small gold markers */}
-      {layerVisibility.assets && culturalAssets.map((asset, i) => (
+      {layerVisibility.assets && culturalAssets.filter(a => a.lat != null && a.lng != null).map((asset, i) => (
         <CircleMarker
-          key={i}
+          key={asset.id || i}
           center={[asset.lat, asset.lng]}
           radius={4}
           pathOptions={{
-            color: '#92400e',
-            fillColor: '#f59e0b',
+            color: asset.status === 'out_of_muni' ? '#b91c1c' : '#92400e',
+            fillColor: asset.status === 'out_of_muni' ? '#ef4444' : '#f59e0b',
             fillOpacity: 0.9,
             weight: 1.5,
           }}
@@ -732,6 +732,7 @@ export default function MapView({
             <br />
             {asset.address}
             {asset.type && <><br /><em>{asset.type}</em></>}
+            {asset.status === 'out_of_muni' && <><br /><span style={{ color: '#b91c1c' }}>⚠ Outside selected municipality</span></>}
           </Popup>
         </CircleMarker>
       ))}

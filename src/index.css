@@ -127,6 +127,11 @@ html, body, #root {
   overflow-y: auto;
   padding: 14px;
   font-size: 13px;
+  transition: width 0.15s ease;
+}
+
+.side-panel.wide {
+  width: 380px;
 }
 
 .side-panel h3 {
@@ -310,4 +315,135 @@ html, body, #root {
 
 .asset-item .address {
   color: #888;
+}
+
+/* Editable cultural assets table */
+.assets-header {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.assets-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-mini {
+  padding: 4px 8px;
+  font-size: 11px;
+  background: #f3f4f6;
+  color: #1f2937;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.btn-mini:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.btn-mini.primary {
+  background: #e94560;
+  color: white;
+  border-color: #e94560;
+}
+
+.btn-mini.primary:hover:not(:disabled) {
+  background: #d63852;
+  border-color: #d63852;
+}
+
+.btn-mini:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.asset-table {
+  margin-top: 8px;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.assets-summary {
+  font-size: 11px;
+  margin-bottom: 6px;
+  padding: 4px 6px;
+  background: #fef2f2;
+  border-radius: 4px;
+}
+
+.asset-row {
+  padding: 6px 6px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.asset-row.flagged {
+  background: #fef2f2;
+  border-left: 2px solid #b91c1c;
+  padding-left: 4px;
+}
+
+.asset-row-line {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.asset-input {
+  flex: 1;
+  min-width: 0;
+  padding: 3px 6px;
+  font-size: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 3px;
+  background: white;
+  color: #111827;
+  font-family: inherit;
+}
+
+.asset-input:focus {
+  outline: none;
+  border-color: #e94560;
+  box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.15);
+}
+
+.asset-input.name { flex: 3; font-weight: 600; }
+.asset-input.addr { flex: 1; }
+.asset-input.city { flex: 2; }
+.asset-input.zip { flex: 1; max-width: 60px; }
+.asset-input.type { flex: 2; }
+
+.asset-status {
+  font-size: 14px;
+  line-height: 1;
+  margin: 0 2px;
+}
+
+.asset-remove {
+  padding: 0 6px;
+  font-size: 16px;
+  line-height: 1;
+  background: transparent;
+  color: #9ca3af;
+  border: none;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.asset-remove:hover:not(:disabled) {
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+.asset-error {
+  font-size: 10px;
+  color: #b91c1c;
+  padding-left: 6px;
 }
