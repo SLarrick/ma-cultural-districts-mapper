@@ -61,11 +61,28 @@ function App() {
     setStatusMessage('Selection cleared')
   }, [])
 
+  const handleMunicipalityChange = useCallback((newMuni) => {
+    if (!newMuni || newMuni.name === municipality?.name) return
+    const hasWork = selectedParcels.size > 0 || culturalAssets.length > 0 || boundaryLayer
+    if (hasWork) {
+      const ok = window.confirm(
+        `Switching to ${newMuni.name} will clear your parcel selection, cultural assets, and district boundary. Continue?`
+      )
+      if (!ok) return
+      setSelectedParcels(new Set())
+      setCulturalAssets([])
+      setBoundaryLayer(null)
+      setEditingBoundary(false)
+    }
+    setMunicipality(newMuni)
+    setStatusMessage(`Loading ${newMuni.name}…`)
+  }, [municipality, selectedParcels, culturalAssets, boundaryLayer])
+
   return (
     <div className="app">
       <Toolbar
         municipality={municipality}
-        onMunicipalityChange={setMunicipality}
+        onMunicipalityChange={handleMunicipalityChange}
         selectedCount={selectedParcels.size}
         onClearSelection={handleClearSelection}
         parcelsData={parcelsData}

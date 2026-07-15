@@ -220,6 +220,14 @@ export default function SidePanel({
         </div>
       )}
 
+      {!municipality && (
+        <div className="upload-area" style={{ opacity: 0.6, cursor: 'default' }}>
+          <p style={{ fontSize: 12, color: '#666', margin: 0 }}>
+            Select a municipality above to add cultural assets.
+          </p>
+        </div>
+      )}
+
       {municipality && (
         <div
           className="upload-area"

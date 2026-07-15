@@ -25,3 +25,6 @@ dist-ssr
 
 # Office temp/lock files
 ~$*
+
+# Claude Code local config (machine-specific)
+.claude/
