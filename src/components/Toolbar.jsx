@@ -41,32 +41,32 @@ export default function Toolbar({
           return
         }
 
-        // Buffer 25m to bridge across streets (including triangular intersections),
-        // then union, then negative buffer to contract back
-        const BUFFER_KM = 0.025 // 25 meters in km
-        let merged = null
-        for (const feature of selectedFeatures) {
-          const buffered = turf.buffer(feature, BUFFER_KM, { units: 'kilometers', steps: 2 })
-          if (!buffered) continue
-          if (!merged) {
-            merged = buffered
-          } else {
-            try {
-              merged = turf.union(turf.featureCollection([merged, buffered]))
-            } catch {
-              // If union fails on a single parcel, continue
+        // Stage A: raw union of selected parcels — preserves exact parcel edges.
+        let merged = turf.union(turf.featureCollection(selectedFeatures))
+
+        // Stage B: if disconnected across streets, apply the smallest buffer that
+        // bridges the gaps. Try 8m first (typical residential street), then 15m
+        // (wider road). If still disconnected, leave as MultiPolygon.
+        if (merged?.geometry?.type === 'MultiPolygon') {
+          for (const bufKm of [0.008, 0.015]) {
+            const inflated = turf.union(
+              turf.featureCollection(
+                selectedFeatures.map(f => turf.buffer(f, bufKm, { units: 'kilometers', steps: 2 })).filter(Boolean)
+              )
+            )
+            const deflated = inflated && turf.buffer(inflated, -bufKm, { units: 'kilometers', steps: 2 })
+            if (deflated?.geometry?.type === 'Polygon') {
+              merged = deflated
+              break
             }
           }
         }
-        if (merged) {
-          // Contract back by the same buffer to restore approximate parcel edges
-          let cleaned = turf.buffer(merged, -BUFFER_KM, { units: 'kilometers', steps: 2 })
-          cleaned = cleaned || merged
 
-          // Simplify geometry aggressively to reduce vertices and produce angular edges
-          // Tolerance of ~0.0005 (~55m) flattens near-straight runs into single segments
-          const simplified = turf.simplify(cleaned, { tolerance: 0.0005, highQuality: true })
-          setBoundaryLayer(simplified || cleaned)
+        if (merged) {
+          // Light simplify: ~2m tolerance drops near-duplicate vertices without
+          // flattening real parcel edges.
+          const simplified = turf.simplify(merged, { tolerance: 0.00002, highQuality: true })
+          setBoundaryLayer(simplified || merged)
           setEditingBoundary(true)
           setStatusMessage(`Boundary created from ${selectedFeatures.length} parcels — drag vertices to edit, then export`)
         }
